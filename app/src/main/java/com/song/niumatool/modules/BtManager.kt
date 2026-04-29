@@ -7,13 +7,13 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.annotation.RequiresPermission
 
-class AppBluetoothManager(private val context: Context) {
+class BtManager(private val context: Context) {
     val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
     val bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    fun getDevice(): Set<BluetoothDevice> {
-        return bluetoothAdapter.bondedDevices
-    }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    fun getDevice(): List<BluetoothDevice> {
+        return bluetoothAdapter.bondedDevices.toList()
+    }
 }

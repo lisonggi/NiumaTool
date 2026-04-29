@@ -8,15 +8,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import com.song.niumatool.ui.screens.AppScreen
 import com.song.niumatool.ui.theme.NiumaToolTheme
+import com.song.niumatool.viewmodel.BtViewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: BtViewModel by viewModels { BtViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestMultiplePermissions.launch(
@@ -25,10 +28,13 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.BLUETOOTH_CONNECT
             )
         )
+
         enableEdgeToEdge()
         setContent {
             NiumaToolTheme {
-                AppScreen()
+                AppScreen(viewModel) {
+                    viewModel.updateSelectedDevice(it)
+                }
             }
         }
     }

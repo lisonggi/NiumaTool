@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization")  version "2.3.20"
+    kotlin("plugin.serialization") version "2.3.20"
 }
 
 android {
@@ -60,5 +60,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.kotlinx.serialization.json)
-//    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.escpos.thermalprinter.android)
+    implementation(files("libs/printer-lib-3.5.5.aar"))
 }

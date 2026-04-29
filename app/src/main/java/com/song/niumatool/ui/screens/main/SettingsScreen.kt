@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.song.niumatool.compose.MySurface
 import com.song.niumatool.model.FunctionMenu
 import com.song.niumatool.model.Route
@@ -23,7 +22,7 @@ private val functionMenuList = listOf(
 )
 
 @Composable
-fun SettingsScreen(navController: NavHostController) {
+fun SettingsScreen(onNavigate: (route: Route) -> Unit) {
     MySurface(modifier = Modifier.padding(horizontal = 10.dp)) {
         LazyColumn {
             items(functionMenuList) {
@@ -31,8 +30,8 @@ fun SettingsScreen(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .clickable() {
-                            navController.navigate(it.route)
+                        .clickable {
+                            onNavigate(it.route)
                         }
                         .padding(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically) {

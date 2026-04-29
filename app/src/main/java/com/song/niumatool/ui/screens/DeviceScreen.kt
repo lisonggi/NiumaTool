@@ -1,6 +1,7 @@
 package com.song.niumatool.ui.screens
 
 import android.Manifest
+import android.bluetooth.BluetoothDevice
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,37 +21,35 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.song.niumatool.compose.MySurface
 import com.song.niumatool.compose.TitleBar
-import com.song.niumatool.modules.AppBluetoothManager
 import com.song.niumatool.viewmodel.BtViewModel
 
 @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
 @Composable
 fun DeviceScreen(
-    btViewModel: BtViewModel, onBack: () -> Unit
+    btViewModel: BtViewModel,
+    onSelectedDevice: (bluetoothDevice: BluetoothDevice) -> Unit,
+    onBack: () -> Unit
 ) {
-    val selectDevice by btViewModel.selectDevice.collectAsState()
-    val appBluetoothManager = AppBluetoothManager(LocalContext.current)
-    var deviceList by remember { mutableStateOf(appBluetoothManager.getDevice().toList()) }
+    btViewModel.reScanDevice()
+    val selectDevice by remember { btViewModel.selectedDevice }
+    val deviceList by remember { btViewModel.deviceList }
+
     TitleBar(label = "选择设备", onBack = onBack, actions = {
         IconButton(
             modifier = Modifier.padding(end = 10.dp),
             onClick = {
-                deviceList = appBluetoothManager.getDevice().toList()
+                btViewModel.reScanDevice()
             }) {
             Icon(Icons.Default.Refresh, "scanner")
         }
@@ -74,7 +73,7 @@ fun DeviceScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { btViewModel.selectDevice(device) }
+                                .clickable { onSelectedDevice(device) }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween

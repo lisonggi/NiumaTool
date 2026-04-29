@@ -1,5 +1,6 @@
-package com.song.niumatool.ui.screens
+package com.song.niumatool.ui.screens.main
 
+import android.Manifest
 import androidx.annotation.RequiresPermission
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -26,12 +27,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.song.niumatool.model.Route
-import com.song.niumatool.ui.screens.main.HomeScreen
-import com.song.niumatool.ui.screens.main.SettingsScreen
 import com.song.niumatool.viewmodel.BtViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
+@RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
 @Composable
 fun MainScreen(navController: NavHostController, btViewModel: BtViewModel) {
     val mainNavController = rememberNavController()
@@ -43,42 +42,32 @@ fun MainScreen(navController: NavHostController, btViewModel: BtViewModel) {
             Triple(Icons.Default.Settings, "设置", Route.MainScreen.Settings)
         )
     }
-    val label = bottomItems
-        .firstOrNull {
-            currentDestination?.destination?.hasRoute(it.third::class) == true
-        }?.second ?: ""
+    val label = bottomItems.firstOrNull {
+        currentDestination?.destination?.hasRoute(it.third::class) == true
+    }?.second ?: ""
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(label) },
-            )
-        },
-        bottomBar = {
-            NavigationBar {
-                bottomItems.forEach { item ->
-                    val isCurrent =
-                        currentDestination?.destination?.hasRoute(item.third::class) == true
-                    NavigationBarItem(
-                        selected = isCurrent,
-                        onClick = {
-                            if (isCurrent) {
-                                return@NavigationBarItem
-                            }
-                            mainNavController.navigate(item.third) {
-                                popUpTo(mainNavController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                        },
-                        icon = {
-                            Icon(item.first, contentDescription = null)
-                        },
-                        label = { Text(item.second) }
-                    )
-                }
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text(label) },
+        )
+    }, bottomBar = {
+        NavigationBar {
+            bottomItems.forEach { item ->
+                val isCurrent = currentDestination?.destination?.hasRoute(item.third::class) == true
+                NavigationBarItem(selected = isCurrent, onClick = {
+                    if (isCurrent) {
+                        return@NavigationBarItem
+                    }
+                    mainNavController.navigate(item.third) {
+                        popUpTo(mainNavController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }, icon = {
+                    Icon(item.first, contentDescription = null)
+                }, label = { Text(item.second) })
             }
         }
-    ) { padding ->
+    }) { padding ->
         NavHost(
             navController = mainNavController,
             startDestination = Route.MainScreen.Home,
@@ -86,16 +75,19 @@ fun MainScreen(navController: NavHostController, btViewModel: BtViewModel) {
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
+            popExitTransition = { ExitTransition.None }) {
             composable<Route.MainScreen.Home> {
-                HomeScreen(btViewModel)
+                HomeScreen(btViewModel) {
+                    navController.navigate(it)
+                }
             }
             composable<Route.MainScreen.Manager> {
-                Text("管理")
+                ManagerScreen()
             }
             composable<Route.MainScreen.Settings> {
-                SettingsScreen(navController)
+                SettingsScreen {
+                    navController.navigate(it)
+                }
             }
         }
     }
